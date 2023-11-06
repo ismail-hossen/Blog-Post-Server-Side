@@ -21,6 +21,12 @@ async function run() {
   try {
     const db = (await client.connect()).db("blog-post");
     const blogCollection = db.collection("blogs");
+    const wishlistCollection = db.collection("wishlists");
+
+    app.get("/api/v1/all-blogs", async (req, res) => {
+      const result = await blogCollection.find().toArray();
+      res.send(result);
+    });
 
     app.get("/api/v1/recent-blogs", async (req, res) => {
       const result = await blogCollection
@@ -34,6 +40,13 @@ async function run() {
     app.post("/api/v1/add-blog", async (req, res) => {
       const body = req.body;
       const result = await blogCollection.insertOne(body);
+      res.status(200).send(result);
+    });
+
+    // api for wishlist
+    app.post("/api/v1/wishlist", async (req, res) => {
+      const body = req.body;
+      const result = await wishlistCollection.insertOne(body);
       res.status(200).send(result);
     });
 
