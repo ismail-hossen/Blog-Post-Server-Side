@@ -25,13 +25,13 @@ async function run() {
     const commentCollection = db.collection("comments");
     // comments apis
     app.get("/api/v1/comments", async (req, res) => {
-      const result = await blogCollection.find().toArray();
+      const result = await commentCollection.find().toArray();
       res.status(200).send(result);
     });
 
     app.post("/api/v1/add-comment", async (req, res) => {
       const body = req.body;
-      const result = await blogCollection.insertOne(body);
+      const result = await commentCollection.insertOne(body);
       res.status(200).send(result);
     });
 
@@ -61,6 +61,15 @@ async function run() {
       const result = await blogCollection.insertOne({
         ...body,
         addedTime: Date.now(),
+      });
+      res.status(200).send(result);
+    });
+
+    app.put("/api/v1/update-blog/:id", async (req, res) => {
+      const body = req.body;
+      const filter = { _id: new ObjectId(req.params.id) };
+      const result = await blogCollection.updateOne(filter, {
+        $set: body,
       });
       res.status(200).send(result);
     });
