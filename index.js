@@ -56,6 +56,23 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/api/v1/featured-blogs", async (req, res) => {
+      const result = await blogCollection
+        .aggregate([
+          {
+            $project: {
+              title: 1,
+              author: 1,
+              wordCount: { $size: { $split: ["$longDescription", " "] } },
+            },
+          },
+          { $sort: { wordCount: -1 } },
+          { $limit: 10 },
+        ])
+        .toArray();
+      res.send(result);
+    });
+
     app.post("/api/v1/add-blog", async (req, res) => {
       const body = req.body;
       const result = await blogCollection.insertOne({
@@ -75,6 +92,12 @@ async function run() {
     });
 
     // api for wishlist
+    app.get("/api/v1/wishlist", async (req, res) => {
+      const email = req.query.email;
+      const result = await wishlistCollection.find({ email: email }).toArray();
+      res.status(200).send(result);
+    });
+
     app.post("/api/v1/wishlist", async (req, res) => {
       const body = req.body;
       const result = await wishlistCollection.insertOne(body);
